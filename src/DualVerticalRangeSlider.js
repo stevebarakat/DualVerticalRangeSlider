@@ -27,6 +27,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   newValue2 = Number(((upperVal - min) * 100) / (max - min));
   newPosition2 = 10 - newValue2 * 0.2;
 
+  console.log(isFocused);
 
   useLayoutEffect(() => {
     lowerRange.current.focus();
@@ -74,22 +75,22 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
 
 
       case 37: //Left
-        (cmd || ctrl) && setValue(value - factor);
+        (cmd || ctrl) && setValue(value - factor - step);
         return;
 
 
       case 40: //Down
-        (cmd || ctrl) && setValue(value - factor);
+        (cmd || ctrl) && setValue(value - factor - step);
         return;
 
 
       case 38: //Up
-        (cmd || ctrl) && setValue(value >= max ? max : value + factor);
+        (cmd || ctrl) && setValue(value >= max ? max : value + factor + step);
         return;
 
 
       case 39: //Right
-        (cmd || ctrl) && setValue(value >= max ? max : value + factor);
+        (cmd || ctrl) && setValue(value >= max ? max : value + factor + step);
         return;
 
 
@@ -142,13 +143,14 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           max={max}
           value={lowerVal}
           step={step}
+          onInput={e => {
+            lowerRange.current.focus();
+            setLowerVal(parseFloat(e.target.valueAsNumber));
+          }}
           onKeyDown={handleKeyPress}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          onInput={e => {
-            setLowerVal(parseFloat(e.target.value));
-            lowerRange.current.focus();
-          }}
+          focused={isFocused}
         />
         <Progress
           focused={isFocused}
@@ -170,12 +172,14 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           max={max}
           value={upperVal}
           step={step}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
           onInput={e => {
             upperRange.current.focus();
-            setUpperVal(parseFloat(e.target.value));
+            setUpperVal(parseFloat(e.target.valueAsNumber));
           }}
+          onKeyDown={handleKeyPress}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          focused={isFocused}
         />
         <Ticks>
           {marks}
@@ -249,10 +253,10 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     -webkit-appearance: none;
     z-index: 50;
     background-color: white;
-    background: ${p => !p.focused && `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
+    background: ${p => !p.focused ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
+    `-webkit-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
     pointer-events: all;
     box-shadow: 0 1px 4px 0.5px rgba(0, 0, 0, 0.25);
-  }
   &::-moz-range-thumb {
     height: 2.2rem;
     width: 2.2rem;
@@ -261,7 +265,8 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     -webkit-appearance: none;
     z-index: 50;
     background-color: white;
-    background: ${p => !p.focused && `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
+    background: ${p => !p.focused ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
+    `-webkit-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
     pointer-events: all;
     box-shadow: 0 1px 4px 0.5px rgba(0, 0, 0, 0.25);
   }
@@ -273,6 +278,7 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     background: ${p => p.focused && `-webkit-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
     transition: all 0.15s ease-out;
   }
+}
 `;
 
 const Progress = styled.div`
@@ -289,16 +295,6 @@ const Progress = styled.div`
     inset 0px 0px 2px hsla(0, 0%, 0%, 0.25);
   transition: all 0.15s ease-out;
 `;
-
-// const Ticks = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   margin-right: ${newValue - 100 / 2 * -0.02 + "rem"};
-//   margin-left: ${newValue - 100 / 2 * -0.02 + "rem"};
-//   position: relative;
-//   top: -3rem;
-//   text-align: right;
-// `;
 
 const Ticks = styled.div`
   display: flex;
