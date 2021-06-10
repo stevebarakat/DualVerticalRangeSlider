@@ -230,17 +230,17 @@ const RangeOutput = styled.div`
 `;
 
 const StyledRangeSlider = styled.input.attrs({ type: "range" })`
+  pointer-events: none;
   appearance: none;
   position: absolute;
   width: 100%;
   height: 15px;
   border-radius: 15px;
   border: 1px solid ${blackColor};
-  background-color: transparent;
+  background: transparent;
   z-index: 1;
   margin: 0;
   border: 0;
-  pointer-events: none;
   &:focus {
     outline: none;
   }
