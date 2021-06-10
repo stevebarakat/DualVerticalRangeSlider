@@ -130,9 +130,8 @@ table {
 
 * {
   box-sizing: border-box;
-  font-size: 16px;
-  -webkit-text-size-adjust: 16px;
-  -ms-text-size-adjust: 16px;
+  -webkit-text-size-adjust: none;
+  -ms-text-size-adjust: none;
 }
 
 body {

@@ -213,7 +213,7 @@ const RangeWrap = styled.div`
 
 const RangeOutput = styled.div`
   position: absolute;
-  margin-top: 3.5rem;
+  margin-top: 2rem;
   margin-left: -0.8rem;
   border: ${p => p.focused ? "none" : `1px solid ${blackColor}`};
   background: ${p => p.focused ? focusColor : whiteColor};
@@ -311,7 +311,7 @@ const Tick = styled.div`
   width: 1px;
   background: ${blackColor};
   height: 5px;
-  margin-top: -0.5rem;
+  margin-top: -1rem;
   span {
     writing-mode: vertical-rl;
     margin-left: 0.4rem;
