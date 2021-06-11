@@ -114,7 +114,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
       <RangeWrap outputWidth={outputWidth} heightVal={height}>
         <RangeOutput
           ref={outputEl}
-          focused={lowerFocused}
+          focused={lowerFocused || upperFocused}
           style={{ left: `calc(${newValue1}% + (${newPosition1 / 10}rem))` }}
           className="range-value"
         >
@@ -136,7 +136,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           onFocus={() => setLowerFocused(true)}
           onBlur={() => setLowerFocused(false)}
           focused={lowerFocused}
-          style={lowerFocused ? {pointerEvents: "none"} : {pointerEvents: "all"}}
+          style={lowerFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
         />
         <Progress
           focused={lowerFocused || upperFocused}
@@ -166,7 +166,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           onFocus={() => setUpperFocused(true)}
           onBlur={() => setUpperFocused(false)}
           focused={upperFocused}
-          style={upperFocused ? {pointerEvents: "none"} : {pointerEvents: "all"}}
+          style={upperFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
         />
         <Ticks>
           {marks}
@@ -247,14 +247,8 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     background: ${p => !p.focused ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
     `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
   }
-
-  &:focus::-webkit-slider-thumb {
-    background: ${p => !p.focused ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
-    `-webkit-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
-    transition: all 0.15s ease-out;
-  }
   
-  &::-moz-range-thumb() {
+  &::-moz-range-thumb {
     pointer-events: all;
     position: relative;
     height: 2.15rem;
@@ -264,13 +258,19 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     cursor: pointer;
     -webkit-appearance: none;
     z-index: 999;
-    background: ${p => !p.focused ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
-    `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
+    background: ${p => !p.focused ? `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
+    `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
   }
 
-  &:focus::-moz-range-thumb() {
+  &:focus::-webkit-slider-thumb {
     background: ${p => !p.focused ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
     `-webkit-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
+    transition: all 0.15s ease-out;
+  }
+
+  &:focus::-moz-range-thumb {
+    background: ${p => !p.focused ? `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
+    `-moz-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
     transition: all 0.15s ease-out;
   }
   
