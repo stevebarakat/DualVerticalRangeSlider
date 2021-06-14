@@ -30,8 +30,6 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   newPosition2 = 10 - newValue2 * 0.2;
 
   useLayoutEffect(() => {
-    console.log(outputEl.current.parentNode.lastChild.lastChild.firstChild);
-    console.log(outputEl.current.parentNode.lastChild.lastChild.firstChild.clientHeight);
     setTickWidth(outputEl.current.parentNode.lastChild.lastChild.firstChild.clientHeight);
     setOutputWidth(outputEl.current.clientHeight);
     lowerRange.current.focus();
@@ -51,7 +49,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   let markers = [];
   for (let i = min; i <= max; i += step) {
     const labelLength = i.toString().length;
-    markers.push(<Tick length={labelLength} key={i}><div>{numberWithCommas(i)}</div></Tick>);
+    markers.push(<Tick length={labelLength} key={i}><div>{prefix + numberWithCommas(i.toFixed(decimals)) + " " + suffix}</div></Tick>);
   }
   const marks = markers.map(marker => marker);
 
@@ -116,13 +114,18 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   return (
     <RangeWrapWrap outputWidth={outputWidth} tickWidth={tickWidth} heightVal={height}>
       <RangeWrap outputWidth={outputWidth} tickWidth={tickWidth} heightVal={height}>
+        <Progress
+          focused={lowerFocused || upperFocused}
+          id="range-color"
+          className="range-color"
+        ></Progress>
         <RangeOutput
           ref={outputEl}
           focused={lowerFocused || upperFocused}
           style={{ left: `calc(${newValue1}% + (${newPosition1 / 10}rem))` }}
           className="range-value"
         >
-          {prefix + numberWithCommas(lowerVal.toFixed(decimals)) + " " + suffix}
+          lo: {prefix + numberWithCommas(lowerVal.toFixed(decimals)) + " " + suffix}
         </RangeOutput>
         <StyledRangeSlider
           tabIndex="0"
@@ -132,27 +135,21 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           max={max}
           value={lowerVal}
           step={step}
-          onInput={e => {
-            lowerRange.current.focus();
-            setLowerVal(parseFloat(e.target.valueAsNumber));
-          }}
           onKeyDown={handleKeyPress}
           onFocus={() => setLowerFocused(true)}
           onBlur={() => setLowerFocused(false)}
+          onInput={e => {
+            setLowerVal(e.target.valueAsNumber);
+          }}
           focused={lowerFocused}
           style={lowerFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
         />
-        <Progress
-          focused={lowerFocused || upperFocused}
-          id="range-color"
-          className="range-color"
-        ></Progress>
         <RangeOutput
           focused={lowerFocused || upperFocused}
           style={{ left: `calc(${newValue2}% + (${newPosition2 / 10}rem))` }}
           className="range-value"
         >
-          {prefix + numberWithCommas(upperVal.toFixed(decimals)) + " " + suffix}
+          up: {prefix + numberWithCommas(upperVal.toFixed(decimals)) + " " + suffix}
         </RangeOutput>
         <StyledRangeSlider
           tabIndex="0"
@@ -162,13 +159,12 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           max={max}
           value={upperVal}
           step={step}
-          onInput={e => {
-            upperRange.current.focus();
-            setUpperVal(parseFloat(e.target.valueAsNumber));
-          }}
           onKeyDown={handleKeyPress}
           onFocus={() => setUpperFocused(true)}
           onBlur={() => setUpperFocused(false)}
+          onInput={e => {
+            setUpperVal(e.target.valueAsNumber);
+          }}
           focused={upperFocused}
           style={upperFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
         />
@@ -208,11 +204,11 @@ const RangeOutput = styled.div`
   position: absolute;
   margin-top: 3.5rem;
   margin-left: -0.8rem;
-  border: ${p => p.focused ? "none" : `1px solid ${blackColor}`};
+  border: ${p => p.focused ? `1px solid ${focusColor}` : `1px solid ${blackColor}`};
   background: ${p => p.focused ? focusColor : whiteColor};
   color: ${p => p.focused ? whiteColor : blackColor};
   text-align: left;
-  padding: 0.75rem 0.25rem;
+  padding: 0.75rem 0.25rem 0.75rem 0.1rem;
   font-size: 1rem;
   display: block;
   border-radius: 5px;
@@ -231,7 +227,6 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
   border-radius: 15px;
   background: transparent;
   margin: 20px 0 0 0;
-  border: 1px solid ${blackColor};
   &:focus {
     outline: none;
   }
@@ -245,7 +240,7 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 1);
     cursor: pointer;
     -webkit-appearance: none;
-    z-index: 999;
+    z-index: 50;
     background: ${p => !p.focused ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
     `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
   }
@@ -258,8 +253,8 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     border-radius: 50%;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 1);
     cursor: pointer;
-    -webkit-appearance: none;
-    z-index: 999;
+    appearance: none;
+    z-index: 50;
     background: ${p => !p.focused ? `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
     `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
   }
@@ -278,7 +273,7 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
   `;
 
 const Progress = styled.div`
-  z-index: -1;
+  z-index: 0;
   background: ${p => p.focused ? `-webkit-linear-gradient(left,  #EFEFEF ${`calc(${newValue2}% + (${newPosition2}px))`},${focusColor} ${`calc(${newValue2}% + (${newPosition2}px))`},${focusColor} ${`calc(${newValue1}% + (${newPosition1}px))`},#EFEFEF ${`calc(${newValue1}% + (${newPosition1}px))`})` :
     `-webkit-linear-gradient(left,  #EFEFEF ${`calc(${newValue2}% + (${newPosition2}px))`},${blurColor} ${`calc(${newValue2}% + (${newPosition2}px))`},${blurColor} ${`calc(${newValue1}% + (${newPosition1}px))`},#EFEFEF ${`calc(${newValue1}% + (${newPosition1}px))`})`};
   border: solid 1px #000;
@@ -312,5 +307,6 @@ const Tick = styled.div`
     writing-mode: vertical-rl;
     margin-left: 0.4rem;
     margin-bottom: 0.5rem;
+    white-space: nowrap;
   }
 `;
