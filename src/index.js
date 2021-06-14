@@ -16,9 +16,9 @@ ReactDOM.render(
         primaryColor50="hsla(196, 100%, 48%, 0.5)"
       />
       <DualVerticalRangeSlider 
-        min={0}
+        min={-500}
         max={500}
-        step={10}
+        step={50}
         decimals={0}
         height="800px"
         primaryColor="hsl(196, 100%, 48%)"
@@ -32,6 +32,7 @@ ReactDOM.render(
         height="800px"
         primaryColor="hsl(196, 100%, 48%)"
         primaryColor50="hsla(196, 100%, 48%, 0.5)"
+        prefix="$"
       />
       <DualVerticalRangeSlider 
         min={0}
@@ -41,6 +42,7 @@ ReactDOM.render(
         height="800px"
         primaryColor="hsl(196, 100%, 48%)"
         primaryColor50="hsla(196, 100%, 48%, 0.5)"
+        suffix="Gallons"
       />
     </div>
   </React.StrictMode>,

@@ -1,14 +1,17 @@
 import React, { useState, useLayoutEffect, useRef } from "react";
 import styled from 'styled-components';
 
-let newValue1 = "";
-let newValue2 = "";
-let newPosition1 = "";
-let newPosition2 = "";
-let focusColor = "";
-let blurColor = "";
-let selectedValue = "";
+let newValue1 = null;
+let newValue2 = null;
+let newPosition1 = null;
+let newPosition2 = null;
+let focusColor = null;
+let blurColor = null;
+let selectedValue = null;
 
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 
 const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, height = "250px", prefix = "", suffix = "", primaryColor = "black", primaryColor50 }) => {
   const upperRange = useRef(null);
@@ -20,15 +23,19 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   const [upperFocused, setUpperFocused] = useState(false);
   const [value, setValue] = useState((min + max) / 2);
   const [outputWidth, setOutputWidth] = useState('');
+  const [tickWidth, setTickWidth] = useState('');
   const factor = (max - min) / 10;
   focusColor = primaryColor;
   blurColor = primaryColor50;
   newValue1 = Number(((lowerVal - min) * 100) / (max - min));
-  newPosition1 = 10 - newValue1 * 0.2;
+  newPosition1 = Number(10 - newValue1 * 0.2);
   newValue2 = Number(((upperVal - min) * 100) / (max - min));
-  newPosition2 = 10 - newValue2 * 0.2;
+  newPosition2 = Number(10 - newValue2 * 0.2);
 
   useLayoutEffect(() => {
+    console.log(outputEl.current.parentNode.lastChild.lastChild.firstChild);
+    console.log(outputEl.current.parentNode.lastChild.lastChild.firstChild.clientHeight);
+    setTickWidth(outputEl.current.parentNode.lastChild.lastChild.firstChild.clientHeight);
     setOutputWidth(outputEl.current.clientHeight);
     lowerRange.current.focus();
     upperRange.current.focus();
@@ -39,15 +46,9 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
     }
   }, [value, max]);
 
-
-  function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-
   let markers = [];
   for (let i = min; i <= max; i += step) {
-    const labelLength = i.toString().length;
-    markers.push(<Tick length={labelLength} key={i}><div>{numberWithCommas(i)}</div></Tick>);
+    markers.push(<Tick key={i}><div>{prefix + numberWithCommas(i.toFixed(decimals)) + " " + suffix}</div></Tick>);
   }
   const marks = markers.map(marker => marker);
 
@@ -110,15 +111,15 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
 
 
   return (
-    <RangeWrapWrap outputWidth={outputWidth} heightVal={height}>
-      <RangeWrap outputWidth={outputWidth} heightVal={height}>
+    <RangeWrapWrap tickWidth={tickWidth} outputWidth={outputWidth} heightVal={height}>
+      <RangeWrap tickWidth={tickWidth} outputWidth={outputWidth} heightVal={height}>
         <RangeOutput
           ref={outputEl}
           focused={lowerFocused || upperFocused}
           style={{ left: `calc(${newValue1}% + (${newPosition1 / 10}rem))` }}
           className="range-value"
         >
-          {lowerVal ? numberWithCommas(lowerVal.toFixed(decimals)) : 0}
+          {lowerVal !== null && prefix + numberWithCommas(lowerVal.toFixed(decimals)) + " " + suffix}
         </RangeOutput>
         <StyledRangeSlider
           tabIndex="0"
@@ -138,17 +139,13 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           focused={lowerFocused}
           style={lowerFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
         />
-        <Progress
-          focused={lowerFocused || upperFocused}
-          id="range-color"
-          className="range-color"
-        ></Progress>
+        <Progress focused={lowerFocused || upperFocused} />
         <RangeOutput
           focused={lowerFocused || upperFocused}
           style={{ left: `calc(${newValue2}% + (${newPosition2 / 10}rem))` }}
           className="range-value"
         >
-          {upperVal ? numberWithCommas(upperVal.toFixed(decimals)) : 0}
+          {upperVal !== null && prefix + numberWithCommas(upperVal.toFixed(decimals)) + " " + suffix}
         </RangeOutput>
         <StyledRangeSlider
           tabIndex="0"
@@ -183,16 +180,17 @@ const blackColor = "#999";
 const whiteColor = "white";
 
 const RangeWrapWrap = styled.div`
-  width: ${p => p.outputWidth * 2 + 40 + "px"};
+  width: ${p => p.outputWidth + p.tickWidth + 70 + "px"};
   height: ${p => p.heightVal};
-  background: pink;
-  border: 1px solid black;
+  background: lightyellow;
+  border: 1px dashed red;
+  padding-left: 10px;
 `;
 const RangeWrap = styled.div`
   width: ${p => p.heightVal};
-  margin-left: ${p => p.outputWidth + "px"};
+  margin-left: ${p => (p.tickWidth) + "px"};
   transform: rotate(270deg);
-  transform-origin: left;
+  transform-origin: top left;
   margin-top: ${p => p.heightVal};
   left: 0;
   top: 0;
@@ -207,7 +205,7 @@ const RangeOutput = styled.div`
   background: ${p => p.focused ? focusColor : whiteColor};
   color: ${p => p.focused ? whiteColor : blackColor};
   text-align: left;
-  padding: 0.75rem 0.25rem;
+  padding: 0.5rem 0.25rem;
   font-size: 1rem;
   display: block;
   border-radius: 5px;
@@ -218,18 +216,14 @@ const RangeOutput = styled.div`
 `;
 
 const StyledRangeSlider = styled.input.attrs({ type: "range" })`
-  margin-right: 8rem;
-  pointer-events: none;
+  cursor: pointer;
   appearance: none;
   position: absolute;
   width: 100%;
   height: 15px;
   border-radius: 15px;
-  border: 1px solid ${blackColor};
   background: transparent;
-  z-index: 1;
   margin: 0;
-  border: 0;
   &:focus {
     outline: none;
   }
@@ -240,10 +234,10 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     height: 2.15rem;
     width: 2.15rem;
     border-radius: 50%;
-    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 1);
     cursor: pointer;
     -webkit-appearance: none;
-    z-index: 999;
+    z-index: 50;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 1);
     background: ${p => !p.focused ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
     `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
   }
@@ -254,10 +248,10 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     height: 2.15rem;
     width: 2.15rem;
     border-radius: 50%;
-    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 1);
     cursor: pointer;
     -webkit-appearance: none;
-    z-index: 999;
+    z-index: 50;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 1);
     background: ${p => !p.focused ? `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)` :
     `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
   }
@@ -273,24 +267,20 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     `-moz-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
     transition: all 0.15s ease-out;
   }
-  
-  
-  
-  `;
+`;
 
 const Progress = styled.div`
   z-index: -1;
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 15px;
+  border-radius: 15px;
+  box-shadow: inset 1px 1px 2px hsla(0, 0%, 0%, 0.25),
+  inset 0px 0px 2px hsla(0, 0%, 0%, 0.25);
+  transition: all 0.15s ease-out;
   background: ${p => p.focused ? `-webkit-linear-gradient(left,  #EFEFEF ${`calc(${newValue2}% + (${newPosition2}px))`},${focusColor} ${`calc(${newValue2}% + (${newPosition2}px))`},${focusColor} ${`calc(${newValue1}% + (${newPosition1}px))`},#EFEFEF ${`calc(${newValue1}% + (${newPosition1}px))`})` :
     `-webkit-linear-gradient(left,  #EFEFEF ${`calc(${newValue2}% + (${newPosition2}px))`},${blurColor} ${`calc(${newValue2}% + (${newPosition2}px))`},${blurColor} ${`calc(${newValue1}% + (${newPosition1}px))`},#EFEFEF ${`calc(${newValue1}% + (${newPosition1}px))`})`};
-  border: solid 1px #000;
-  border-radius: 50px;
-  width: 100%;
-  display: block;
-  height: 15px;
-  position: absolute;
-  box-shadow: inset 1px 1px 2px hsla(0, 0%, 0%, 0.25),
-    inset 0px 0px 2px hsla(0, 0%, 0%, 0.25);
-  transition: all 0.15s ease-out;
 `;
 
 const Ticks = styled.div`
@@ -308,8 +298,8 @@ const Tick = styled.div`
   width: 1px;
   background: ${blackColor};
   height: 5px;
-  margin-top: -1rem;
   div {
+    white-space: nowrap;
     writing-mode: vertical-rl;
     margin-left: 0.4rem;
     margin-bottom: 0.5rem;
