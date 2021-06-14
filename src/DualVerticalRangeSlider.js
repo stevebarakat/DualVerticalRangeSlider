@@ -16,8 +16,9 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   const outputEl = useRef(null);
   const [lowerVal, setLowerVal] = useState(min - 1);
   const [upperVal, setUpperVal] = useState(max);
-  const [lowerFocused, setLowerFocused] = useState(false);
-  const [upperFocused, setUpperFocused] = useState(false);
+  const [lowerFocused, setLowerFocused] = useState(true);
+  const [upperFocused, setUpperFocused] = useState(true);
+  const [progressFocused, setProgressFocused] = useState(false);
   const [value, setValue] = useState((min + max) / 2);
   const [outputWidth, setOutputWidth] = useState('');
   const [tickWidth, setTickWidth] = useState('');
@@ -32,8 +33,8 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   useLayoutEffect(() => {
     setTickWidth(outputEl.current.parentNode.lastChild.lastChild.firstChild.clientHeight);
     setOutputWidth(outputEl.current.clientHeight);
-    lowerRange.current.focus();
-    upperRange.current.focus();
+    // lowerRange.current.focus();
+    // upperRange.current.focus();
     if (value > max) {
       setValue(max);
     } else {
@@ -115,13 +116,13 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
     <RangeWrapWrap outputWidth={outputWidth} tickWidth={tickWidth} heightVal={height}>
       <RangeWrap outputWidth={outputWidth} tickWidth={tickWidth} heightVal={height}>
         <Progress
-          focused={lowerFocused || upperFocused}
+          focused={progressFocused}
           id="range-color"
           className="range-color"
         ></Progress>
         <RangeOutput
           ref={outputEl}
-          focused={lowerFocused || upperFocused}
+          focused={progressFocused}
           style={{ left: `calc(${newValue1}% + (${newPosition1 / 10}rem))` }}
           className="range-value"
         >
@@ -136,8 +137,11 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           value={lowerVal}
           step={step}
           onKeyDown={handleKeyPress}
-          onFocus={() => setLowerFocused(true)}
-          onBlur={() => setLowerFocused(false)}
+          onFocus={() => {
+            setLowerFocused(true);
+            setProgressFocused(true);
+          }}
+          onBlur={() => setProgressFocused(false)}
           onInput={e => {
             setLowerVal(e.target.valueAsNumber);
           }}
@@ -145,7 +149,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           style={lowerFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
         />
         <RangeOutput
-          focused={lowerFocused || upperFocused}
+          focused={progressFocused}
           style={{ left: `calc(${newValue2}% + (${newPosition2 / 10}rem))` }}
           className="range-value"
         >
@@ -160,8 +164,11 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           value={upperVal}
           step={step}
           onKeyDown={handleKeyPress}
-          onFocus={() => setUpperFocused(true)}
-          onBlur={() => setUpperFocused(false)}
+          onFocus={() => {
+            setUpperFocused(true);
+            setProgressFocused(true);
+          }}          
+          onBlur={() => setProgressFocused(false)}
           onInput={e => {
             setUpperVal(e.target.valueAsNumber);
           }}
