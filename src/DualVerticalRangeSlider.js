@@ -17,7 +17,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   const [lowerFocused, setLowerFocused] = useState(true);
   const [upperFocused, setUpperFocused] = useState(true);
   const [progressFocused, setProgressFocused] = useState(false);
-  const [selectedValue, setSelectedValue] = useState({upper: "", lower:""});
+  const [selectedValue, setSelectedValue] = useState({ upper: "", lower: "" });
   const [outputWidth, setOutputWidth] = useState('');
   const [tickWidth, setTickWidth] = useState('');
   const factor = (max - min) / 10;
@@ -35,7 +35,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
 
   useEffect(() => {
     console.log(selectedValue.upper, selectedValue.lower);
-  }, [selectedValue])
+  }, [selectedValue]);
 
   function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -49,9 +49,6 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   const marks = markers.map(marker => marker);
 
   function handleKeyPress(e) {
-    lowerRange.current.focus();
-    upperRange.current.focus();
-
     // Check if modifier key is pressed
     const cmd = e.metaKey;
     const ctrl = e.ctrlKey;
@@ -68,20 +65,39 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
         upperRange.current.blur();
         lowerRange.current.blur();
         return;
-      // case 37: //Left
-      //   (cmd || ctrl) && setValue(value - factor - step);
-      //   return;
-      // case 40: //Down
-      //   (cmd || ctrl) && setValue(value - factor - step);
-      //   return;
-      // case 38: //Up
-      //   (cmd || ctrl) && setValue(value >= max ? max : value + factor + step);
-      //   return;
-      // case 39: //Right
-      //   (cmd || ctrl) && setValue(value >= max ? max : value + factor + step);
-      //   return;
-      default:
+      case 37: //Left
+        if (cmd || ctrl) {
+          lowerRange.current.focused && setLowerVal(lowerVal - factor - step);
+          upperRange.current.focused && setUpperVal(upperVal - factor - step);
+        }
         return;
+      case 40: //Down
+        if (cmd || ctrl) {
+          lowerRange.current.focused && setLowerVal(lowerVal - factor - step);
+          upperRange.current.focused && setUpperVal(upperVal - factor - step);
+        }
+        return;
+      case 38: //Up
+        if (cmd || ctrl) {
+          console.log(lowerRange)
+          console.log(upperRange)
+          lowerRange.current.focused = () => {
+            setLowerVal(lowerVal + factor + step);
+            upperRange.current.blur();
+          };
+          upperRange.current.focused = () => {
+            setUpperVal(upperVal + factor + step);
+            lowerRange.current.blur();
+          };
+        }
+        return;
+      case 39: //Right
+        if (cmd || ctrl) {
+          lowerRange.current.focused && setLowerVal(lowerVal + factor + step);
+          upperRange.current.focused && setUpperVal(upperVal + factor + step);
+        }
+        return;
+      default:
     }
   }
 
@@ -132,7 +148,6 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           max={max}
           value={lowerVal}
           step={step}
-          onKeyDown={handleKeyPress}
           onFocus={() => {
             setLowerFocused(true);
             setProgressFocused(true);
@@ -141,6 +156,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           onInput={e => {
             setLowerVal(e.target.valueAsNumber);
           }}
+          onKeyDown={e => handleKeyPress(e)}
           focused={lowerFocused}
           style={lowerFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
         />
@@ -159,15 +175,15 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           max={max}
           value={upperVal}
           step={step}
-          onKeyDown={handleKeyPress}
           onFocus={() => {
             setUpperFocused(true);
             setProgressFocused(true);
-          }}          
+          }}
           onBlur={() => setProgressFocused(false)}
           onInput={e => {
             setUpperVal(e.target.valueAsNumber);
           }}
+          onKeyDown={e => handleKeyPress(e)}
           focused={upperFocused}
           style={upperFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
         />
