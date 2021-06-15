@@ -73,7 +73,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, t
   //If the upper value slider is LESS THAN the lower value slider.
   if (upperVal > lowerVal) {
     //The lower slider value is set to equal the upper value slider.
-    upperVal && setLowerVal(parseFloat(upperVal));
+    setLowerVal(parseFloat(upperVal));
     //If the lower value slider equals its set minimum.
     if (lowerVal === 0) {
       //Set the upper slider value to equal 1.
@@ -83,14 +83,13 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, t
   //If the lower value slider is GREATER THAN the upper value slider minus one.
   if (lowerVal < upperVal - 1) {
     //The upper slider value is set to equal the lower value slider.
-    lowerVal && setUpperVal(parseFloat(lowerVal));
+    setUpperVal(parseFloat(lowerVal));
     //If the upper value slider equals its set maximum.
     if (upperVal === max) {
       //Set the lower slider value to equal the upper value slider's maximum value.
       setLowerVal(parseFloat(max));
     }
   }
-
 
   return (
     <RangeWrapWrap outputWidth={outputWidth} ticks={ticks} tickWidth={tickWidth} heightVal={height}>
