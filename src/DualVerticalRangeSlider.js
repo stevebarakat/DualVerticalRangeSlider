@@ -7,6 +7,7 @@ let newPosition1 = "";
 let newPosition2 = "";
 let focusColor = "";
 let blurColor = "";
+let metaKey = false;
 
 const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, height = "250px", prefix = "", suffix = "", primaryColor = "black", primaryColor50 }) => {
   const upperRange = useRef(null);
@@ -52,7 +53,8 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
     // Check if modifier key is pressed
     const cmd = e.metaKey;
     const ctrl = e.ctrlKey;
-
+    if(cmd || ctrl) metaKey = true;
+    
     switch (e.keyCode) {
       case 13: //Enter
       case 32: //Space
@@ -79,16 +81,12 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
         return;
       case 38: //Up
         if (cmd || ctrl) {
-          console.log(lowerRange)
-          console.log(upperRange)
-          lowerRange.current.focused = () => {
-            setLowerVal(lowerVal + factor + step);
-            upperRange.current.blur();
-          };
-          upperRange.current.focused = () => {
-            setUpperVal(upperVal + factor + step);
-            lowerRange.current.blur();
-          };
+          console.log(lowerRange);
+          console.log(upperRange);
+          setLowerVal(lowerVal + factor + step);
+          // upperRange.current.blur();
+          setUpperVal(upperVal + factor + step);
+          // lowerRange.current.blur();
         }
         return;
       case 39: //Right
@@ -154,8 +152,11 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           }}
           onBlur={() => setProgressFocused(false)}
           onInput={e => {
+            console.log(metaKey);
+            metaKey &&
             setLowerVal(e.target.valueAsNumber);
           }}
+          onKeyUp={() => metaKey = false}
           onKeyDown={e => handleKeyPress(e)}
           focused={lowerFocused}
           style={lowerFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
@@ -181,8 +182,11 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           }}
           onBlur={() => setProgressFocused(false)}
           onInput={e => {
+            console.log(metaKey);
+            metaKey &&
             setUpperVal(e.target.valueAsNumber);
           }}
+          onKeyUp={() => metaKey = false}
           onKeyDown={e => handleKeyPress(e)}
           focused={upperFocused}
           style={upperFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
