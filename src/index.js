@@ -8,9 +8,10 @@ ReactDOM.render(
     <div style={{ display: 'flex' }}>
       <DualVerticalRangeSlider 
         min={0}
-        max={500}
+        max={100}
         step={10}
-        decimals={2}
+        ticks
+        // decimals={2}
         height="800px"
         primaryColor="hsl(196, 100%, 48%)"
         primaryColor50="hsla(196, 100%, 48%, 0.5)"

@@ -7,9 +7,9 @@ let newPosition1 = "";
 let newPosition2 = "";
 let focusColor = "";
 let blurColor = "";
-let metaKey = false;
+let marks = [];
 
-const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, height = "250px", prefix = "", suffix = "", primaryColor = "black", primaryColor50 }) => {
+const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, ticks = true, height = "250px", prefix = "", suffix = "", primaryColor = "black", primaryColor50 }) => {
   const upperRange = useRef(null);
   const lowerRange = useRef(null);
   const outputEl = useRef(null);
@@ -30,9 +30,9 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   newPosition2 = 10 - newValue2 * 0.2;
 
   useLayoutEffect(() => {
-    setTickWidth(outputEl.current.parentNode.lastChild.lastChild.firstChild.clientHeight);
+    ticks && setTickWidth(outputEl.current.parentNode.lastChild.lastChild.firstChild.clientHeight);
     setOutputWidth(outputEl.current.clientHeight);
-  }, []);
+  }, [ticks, lowerVal, upperVal]);
 
   useEffect(() => {
     console.log(selectedValue.upper, selectedValue.lower);
@@ -42,19 +42,16 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  let markers = [];
-  for (let i = min; i <= max; i += step) {
-    const labelLength = i.toString().length;
-    markers.push(<Tick length={labelLength} key={i}><div>{prefix + numberWithCommas(i.toFixed(decimals)) + " " + suffix}</div></Tick>);
+  if (ticks) {
+    let markers = [];
+    for (let i = min; i <= max; i += step) {
+      const labelLength = i.toString().length;
+      markers.push(<Tick length={labelLength} key={i}><div>{prefix + numberWithCommas(i.toFixed(decimals)) + " " + suffix}</div></Tick>);
+    }
+    marks = markers.map(marker => marker);
   }
-  const marks = markers.map(marker => marker);
 
   function handleKeyPress(e) {
-    // Check if modifier key is pressed
-    const cmd = e.metaKey;
-    const ctrl = e.ctrlKey;
-    if(cmd || ctrl) metaKey = true;
-    
     switch (e.keyCode) {
       case 13: //Enter
       case 32: //Space
@@ -67,35 +64,8 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
         upperRange.current.blur();
         lowerRange.current.blur();
         return;
-      case 37: //Left
-        if (cmd || ctrl) {
-          lowerRange.current.focused && setLowerVal(lowerVal - factor - step);
-          upperRange.current.focused && setUpperVal(upperVal - factor - step);
-        }
-        return;
-      case 40: //Down
-        if (cmd || ctrl) {
-          lowerRange.current.focused && setLowerVal(lowerVal - factor - step);
-          upperRange.current.focused && setUpperVal(upperVal - factor - step);
-        }
-        return;
-      case 38: //Up
-        if (cmd || ctrl) {
-          console.log(lowerRange);
-          console.log(upperRange);
-          setLowerVal(lowerVal + factor + step);
-          // upperRange.current.blur();
-          setUpperVal(upperVal + factor + step);
-          // lowerRange.current.blur();
-        }
-        return;
-      case 39: //Right
-        if (cmd || ctrl) {
-          lowerRange.current.focused && setLowerVal(lowerVal + factor + step);
-          upperRange.current.focused && setUpperVal(upperVal + factor + step);
-        }
-        return;
-      default:
+      default: 
+        return null;
     }
   }
 
@@ -112,19 +82,19 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   }
   //If the lower value slider is GREATER THAN the upper value slider minus one.
   if (lowerVal < upperVal - 1) {
-    //The upper slider value is set to equal the lower value slider plus one.
-    lowerVal && setUpperVal(parseFloat(lowerVal) + 1);
+    //The upper slider value is set to equal the lower value slider.
+    lowerVal && setUpperVal(parseFloat(lowerVal));
     //If the upper value slider equals its set maximum.
     if (upperVal === max) {
-      //Set the lower slider value to equal the upper value slider's maximum value minus one.
+      //Set the lower slider value to equal the upper value slider's maximum value.
       setLowerVal(parseFloat(max));
     }
   }
 
 
   return (
-    <RangeWrapWrap outputWidth={outputWidth} tickWidth={tickWidth} heightVal={height}>
-      <RangeWrap outputWidth={outputWidth} tickWidth={tickWidth} heightVal={height}>
+    <RangeWrapWrap outputWidth={outputWidth} ticks={ticks} tickWidth={tickWidth} heightVal={height}>
+      <RangeWrap outputWidth={outputWidth} ticks={ticks} tickWidth={tickWidth} heightVal={height}>
         <Progress
           focused={progressFocused}
           id="range-color"
@@ -152,12 +122,8 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           }}
           onBlur={() => setProgressFocused(false)}
           onInput={e => {
-            console.log(metaKey);
-            metaKey ?
-            setLowerVal(e.target.valueAsNumber) :
-            setUpperVal(e.target.valueAsNumber); 
+            setLowerVal(e.target.valueAsNumber);
           }}
-          onKeyUp={() => metaKey = false}
           onKeyDown={e => handleKeyPress(e)}
           focused={lowerFocused}
           style={lowerFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
@@ -183,19 +149,13 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           }}
           onBlur={() => setProgressFocused(false)}
           onInput={e => {
-            console.log(metaKey);
-            metaKey ?
-            setUpperVal(e.target.valueAsNumber) :
-            setLowerVal(e.target.valueAsNumber);
+            setUpperVal(e.target.valueAsNumber);
           }}
-          onKeyUp={() => metaKey = false}
           onKeyDown={e => handleKeyPress(e)}
           focused={upperFocused}
           style={upperFocused ? { pointerEvents: "none" } : { pointerEvents: "all" }}
         />
-        <Ticks>
-          {marks}
-        </Ticks>
+        {ticks && <Ticks>{marks}</Ticks>}
       </RangeWrap>
     </RangeWrapWrap>
   );
@@ -208,7 +168,7 @@ const blackColor = "#999";
 const whiteColor = "white";
 
 const RangeWrapWrap = styled.div`
-  width: ${p => p.outputWidth + p.tickWidth + 70 + "px"};
+  width: ${p => p.ticks ? p.outputWidth + p.tickWidth + 75 + "px" : p.outputWidth + 60 + "px"};
   height: ${p => p.heightVal};
   background: lightyellow;
   border: 1px dashed red;
@@ -216,7 +176,7 @@ const RangeWrapWrap = styled.div`
 `;
 const RangeWrap = styled.div`
   width: ${p => p.heightVal};
-  margin-left: ${p => (p.tickWidth) + "px"};
+  margin-left: ${p => p.ticks ? p.tickWidth + "px" : "-1rem"};
   transform: rotate(270deg);
   transform-origin: top left;
   margin-top: ${p => p.heightVal};
