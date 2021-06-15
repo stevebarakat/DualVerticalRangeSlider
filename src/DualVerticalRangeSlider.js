@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import styled from 'styled-components';
 
 let newValue1 = "";
@@ -7,8 +7,6 @@ let newPosition1 = "";
 let newPosition2 = "";
 let focusColor = "";
 let blurColor = "";
-let selectedValue = "";
-
 
 const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, height = "250px", prefix = "", suffix = "", primaryColor = "black", primaryColor50 }) => {
   const upperRange = useRef(null);
@@ -19,7 +17,7 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   const [lowerFocused, setLowerFocused] = useState(true);
   const [upperFocused, setUpperFocused] = useState(true);
   const [progressFocused, setProgressFocused] = useState(false);
-  const [value, setValue] = useState((min + max) / 2);
+  const [selectedValue, setSelectedValue] = useState({upper: "", lower:""});
   const [outputWidth, setOutputWidth] = useState('');
   const [tickWidth, setTickWidth] = useState('');
   const factor = (max - min) / 10;
@@ -33,15 +31,11 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   useLayoutEffect(() => {
     setTickWidth(outputEl.current.parentNode.lastChild.lastChild.firstChild.clientHeight);
     setOutputWidth(outputEl.current.clientHeight);
-    // lowerRange.current.focus();
-    // upperRange.current.focus();
-    if (value > max) {
-      setValue(max);
-    } else {
-      setValue(lowerRange.current.valueAsNumber);
-    }
-  }, [value, max]);
+  }, []);
 
+  useEffect(() => {
+    console.log(selectedValue.upper, selectedValue.lower);
+  }, [selectedValue])
 
   function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -65,25 +59,27 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
     switch (e.keyCode) {
       case 13: //Enter
       case 32: //Space
-        selectedValue = value;
-        console.log(selectedValue);
+        setSelectedValue({
+          upper: upperVal,
+          lower: lowerVal
+        });
         return;
       case 27: //Esc
         upperRange.current.blur();
         lowerRange.current.blur();
         return;
-      case 37: //Left
-        (cmd || ctrl) && setValue(value - factor - step);
-        return;
-      case 40: //Down
-        (cmd || ctrl) && setValue(value - factor - step);
-        return;
-      case 38: //Up
-        (cmd || ctrl) && setValue(value >= max ? max : value + factor + step);
-        return;
-      case 39: //Right
-        (cmd || ctrl) && setValue(value >= max ? max : value + factor + step);
-        return;
+      // case 37: //Left
+      //   (cmd || ctrl) && setValue(value - factor - step);
+      //   return;
+      // case 40: //Down
+      //   (cmd || ctrl) && setValue(value - factor - step);
+      //   return;
+      // case 38: //Up
+      //   (cmd || ctrl) && setValue(value >= max ? max : value + factor + step);
+      //   return;
+      // case 39: //Right
+      //   (cmd || ctrl) && setValue(value >= max ? max : value + factor + step);
+      //   return;
       default:
         return;
     }
