@@ -13,8 +13,8 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
   const upperRange = useRef(null);
   const lowerRange = useRef(null);
   const outputEl = useRef(null);
-  const [lowerVal, setLowerVal] = useState(min - 1);
-  const [upperVal, setUpperVal] = useState(max);
+  const [lowerVal, setLowerVal] = useState(max / 3);
+  const [upperVal, setUpperVal] = useState(max / 1.5);
   const [lowerFocused, setLowerFocused] = useState(true);
   const [upperFocused, setUpperFocused] = useState(true);
   const [progressFocused, setProgressFocused] = useState(false);
@@ -153,8 +153,9 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           onBlur={() => setProgressFocused(false)}
           onInput={e => {
             console.log(metaKey);
-            metaKey &&
-            setLowerVal(e.target.valueAsNumber);
+            metaKey ?
+            setLowerVal(e.target.valueAsNumber) :
+            setUpperVal(e.target.valueAsNumber); 
           }}
           onKeyUp={() => metaKey = false}
           onKeyDown={e => handleKeyPress(e)}
@@ -183,8 +184,9 @@ const DualVerticalRangeSlider = ({ min = 0, max = 100, decimals = 0, step = 0, h
           onBlur={() => setProgressFocused(false)}
           onInput={e => {
             console.log(metaKey);
-            metaKey &&
-            setUpperVal(e.target.valueAsNumber);
+            metaKey ?
+            setUpperVal(e.target.valueAsNumber) :
+            setLowerVal(e.target.valueAsNumber);
           }}
           onKeyUp={() => metaKey = false}
           onKeyDown={e => handleKeyPress(e)}
