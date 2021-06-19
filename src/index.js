@@ -20,7 +20,7 @@ ReactDOM.render(
           step={5}
           ticks
           // decimals={2}
-          height="800px"
+          height="500px"
           primaryColor="hsl(196, 100%, 48%)"
           primaryColor50="hsla(196, 100%, 48%, 0.5)"
           initiaUpperVal={70}

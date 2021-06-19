@@ -131,9 +131,12 @@ const DualVerticalRangeSlider = ({
           ref={outputEl}
           focused={progressFocused}
           className="disable-select"
-          style={{ left: `calc(${newValue1}% + (${newPosition1 / 10}rem))` }}
+          style={{
+            transform: `translate3d(${newValue1 * 99}%, 0, 0)`,
+            left: `${newPosition1 / 10}rem`
+          }}
         >
-          {prefix + numberWithCommas(lowerVal.toFixed(decimals)) + " " + suffix}
+          <span>{prefix + numberWithCommas(lowerVal.toFixed(decimals)) + " " + suffix}</span>
         </RangeOutput>
         <StyledRangeSlider
           tabIndex="0"
@@ -161,9 +164,12 @@ const DualVerticalRangeSlider = ({
         <RangeOutput
           focused={progressFocused}
           className="disable-select"
-          style={{ left: `calc(${newValue2}% + (${newPosition2 / 10}rem))` }}
+          style={{
+            transform: `translate3d(${newValue2 * 99}%, 0, 0)`,
+            left: `${newPosition2 / 10}rem`
+          }}
         >
-          {prefix + numberWithCommas(upperVal.toFixed(decimals)) + " " + suffix}
+          <span>{prefix + numberWithCommas(upperVal.toFixed(decimals)) + " " + suffix}</span>
         </RangeOutput>
         <StyledRangeSlider
           tabIndex="0"
@@ -200,10 +206,10 @@ const blackColor = "#999";
 const whiteColor = "white";
 
 const RangeWrapWrap = styled.div`
-  width: ${(p) =>
-    p.ticks
-      ? p.outputWidth + p.tickWidth + 75 + "px"
-      : p.outputWidth + 60 + "px"};
+  width: ${(p) => p.ticks ?
+    p.outputWidth + p.tickWidth + 75 + "px" :
+    p.outputWidth + 60 + "px"
+  };
   height: ${(p) => p.heightVal};
   border: 2px dashed red;
   border-radius: 3px;
@@ -220,24 +226,45 @@ const RangeWrap = styled.div`
   font-family: sans-serif;
 `;
 
+// const RangeOutput = styled.div`
+//   cursor: default;
+//   position: absolute;
+//   margin-top: 3.5rem;
+//   margin-left: -0.8rem;
+//   border: ${(p) =>
+//     p.focused ? `1px solid ${focusColor}` : `1px solid ${blackColor}`};
+//   background: ${(p) => (p.focused ? focusColor : whiteColor)};
+//   color: ${(p) => (p.focused ? whiteColor : blackColor)};
+//   text-align: left;
+//   padding: 0.75rem 0.25rem 0.75rem 0.1rem;
+//   font-size: 1rem;
+//   display: block;
+//   border-radius: 5px;
+//   box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.25);
+//   writing-mode: vertical-lr;
+//   transition: all 0.15s ease-out;
+//   white-space: nowrap;
+// `;
+
 const RangeOutput = styled.div`
-  cursor: default;
+  width: 1%;
   position: absolute;
+  display: flex;
+  justify-content: center;
   margin-top: 3.5rem;
-  margin-left: -0.8rem;
-  border: ${(p) =>
-    p.focused ? `1px solid ${focusColor}` : `1px solid ${blackColor}`};
-  background: ${(p) => (p.focused ? focusColor : whiteColor)};
-  color: ${(p) => (p.focused ? whiteColor : blackColor)};
-  text-align: left;
-  padding: 0.75rem 0.25rem 0.75rem 0.1rem;
+  text-align: center;
   font-size: 1rem;
-  display: block;
-  border-radius: 5px;
-  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.25);
-  writing-mode: vertical-lr;
   transition: all 0.15s ease-out;
-  white-space: nowrap;
+  span{
+    writing-mode: vertical-lr;
+    border: ${p => p.focused ? "none" : `1px solid ${blackColor}`};
+    border-radius: 5px;
+    color: ${p => p.focused ? whiteColor : blackColor};
+    background: ${p => p.focused ? focusColor : whiteColor};
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.25);
+    padding: 0.5rem 0.25rem;
+    white-space: nowrap;
+  }
 `;
 
 const StyledRangeSlider = styled.input.attrs({ type: "range" })`
@@ -264,9 +291,9 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     -webkit-appearance: none;
     z-index: 50;
     background: ${(p) =>
-      !p.focused
-        ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`
-        : `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
+    p.focused
+      ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`
+      : `-webkit-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
   }
 
   &::-moz-range-thumb {
@@ -280,36 +307,37 @@ const StyledRangeSlider = styled.input.attrs({ type: "range" })`
     appearance: none;
     z-index: 50;
     background: ${(p) =>
-      !p.focused
-        ? `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`
-        : `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`};
+    p.focused
+      ? `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`
+      : `-moz-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
   }
 
-  &:focus::-webkit-slider-thumb {
+  /* &:focus::-webkit-slider-thumb {
     cursor: grabbing;
     background: ${(p) =>
-      !p.focused
-        ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`
-        : `-webkit-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
+    !p.focused
+      ? `-webkit-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`
+      : `-webkit-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
     transition: all 0.15s ease-out;
   }
 
   &:focus::-moz-range-thumb {
     cursor: grabbing;
     background: ${(p) =>
-      !p.focused
-        ? `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`
-        : `-moz-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
+    !p.focused
+      ? `-moz-radial-gradient(center, ellipse cover,  ${focusColor} 0%,${focusColor} 35%,${whiteColor} 40%,${whiteColor} 100%)`
+      : `-moz-radial-gradient(center, ellipse cover,  ${whiteColor} 0%,${whiteColor} 35%,${focusColor} 40%,${focusColor} 100%)`};
     transition: all 0.15s ease-out;
-  }
+  } */
 `;
 
 const Progress = styled.div`
   z-index: 0;
-  background: ${(p) =>
-    p.focused
-      ? `-webkit-linear-gradient(left,  #EFEFEF ${`calc(${newValue2}% + (${newPosition2}px))`},${focusColor} ${`calc(${newValue2}% + (${newPosition2}px))`},${focusColor} ${`calc(${newValue1}% + (${newPosition1}px))`},#EFEFEF ${`calc(${newValue1}% + (${newPosition1}px))`})`
-      : `-webkit-linear-gradient(left,  #EFEFEF ${`calc(${newValue2}% + (${newPosition2}px))`},${blurColor} ${`calc(${newValue2}% + (${newPosition2}px))`},${blurColor} ${`calc(${newValue1}% + (${newPosition1}px))`},#EFEFEF ${`calc(${newValue1}% + (${newPosition1}px))`})`};
+  background: ${(p) => p.focused
+    ? `-webkit-linear-gradient(left,  #EFEFEF ${`calc(${newValue2}% + (${newPosition2}px))`},${focusColor} ${`calc(${newValue2}% + 
+    (${newPosition2}px))`},${focusColor} ${`calc(${newValue1}% + (${newPosition1}px))`},#EFEFEF ${`calc(${newValue1}% + (${newPosition1}px))`})`
+    : `-webkit-linear-gradient(left,  #EFEFEF ${`calc(${newValue2}% + (${newPosition2}px))`},${blurColor} ${`calc(${newValue2}% + 
+    (${newPosition2}px))`},${blurColor} ${`calc(${newValue1}% + (${newPosition1}px))`},#EFEFEF ${`calc(${newValue1}% + (${newPosition1}px))`})`};
   border: solid 1px #000;
   border-radius: 50px;
   width: 100%;
